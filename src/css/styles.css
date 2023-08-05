@@ -1,0 +1,76 @@
+/*Галерея*/
+.gallery {
+    max-width: 1260px;
+    margin: 20px auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+.gallery__link {
+    color: #000000;
+    text-decoration: none;
+}
+
+.photo-card {
+    border-radius: 10px;
+    box-shadow: 0 8px 8px -5px rgba(0, 0, 0, 0.3);
+}
+
+.info {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.img-item{
+width: 400px;
+height: 250px;
+}
+
+/*Пошукова форма*/
+.search-form {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+    padding: 8px 0;
+    background-color: #6689f1fb;
+    border-radius: 10px;
+    text-align: center;
+}
+
+input[name='searchQuery'] {
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+}
+
+button[type='submit'] {
+    border: none;
+    line-height: 0;
+    padding: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+/* Button */
+.load-more {
+    padding: 10px 20px;
+    display: none;
+    margin: 0 auto;
+    border-radius: 5px;
+    border: none;
+    color: #ffffff;
+    background-color: #0f3fcffb;
+}
+
+.shown-btn {
+    display: block;
+}

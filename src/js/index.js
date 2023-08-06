@@ -49,25 +49,19 @@ async function handleSearchSubmit(evt) {
 
   page = 1;
 
+  searchQuery = evt.target.elements.searchQuery.value.trim();
+
   //Первіряємо на ввід данних та якщо є просто пробіли
-  if (!evt.target.elements.searchQuery.value.trim()) {
+  if (!searchQuery) {
     Notiflix.Notify.info('Please, insert a search query');
     return;
   }
-
-  searchQuery = evt.target.elements.searchQuery.value;
 
   try {
     const resp = await searchData(searchQuery, page);
 
     const { hits, totalHits } = resp.data;
-    //Якщо бекенд повертає порожній масив, значить нічого підходящого не було знайдено. У такому разі показуй повідомлення з текстом "Sorry, there are no images matching your search query. Please try again.".
-    if (!hits.length) {
-      Notiflix.Notify.failure(
-        'Sorry, there are no images matching your search query. Please try again.'
-      );
-      return;
-    }
+
     //Після першого запиту з кожним новим пошуком отримувати повідомлення, в якому буде написано, скільки всього знайшли зображень (властивість totalHits). Текст повідомлення - "Hooray! We found totalHits images."
     Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
 
@@ -84,6 +78,17 @@ async function handleSearchSubmit(evt) {
     lightbox.refresh();
 
     page += 1;
+
+    //Якщо бекенд повертає порожній масив, значить нічого підходящого не було знайдено.
+    //У такому разі показуй повідомлення з текстом "Sorry, there are no images matching your search query. Please try again.".
+    if (hits.length < PER_PAGE) {
+      //if (!hits.length) {
+      observer.unobserve(links.scrollArea);
+      Notiflix.Notify.failure(
+        'Sorry, there are no images matching your search query. Please try again.'
+      );
+      return;
+    }
   } catch (error) {
     console.log(error);
     Notiflix.Notify.failure(
@@ -100,21 +105,28 @@ function handleLoadMoreInfo(entries, observer) {
     if (entry.isIntersecting) {
       try {
         const resp = await searchData(searchQuery, page);
-        const { hits } = resp.data;
+        const { hits, totalHits } = resp.data;
 
         const galleryMarkup = createGallery(hits);
         links.galleryWrapper.insertAdjacentHTML('beforeend', galleryMarkup);
 
         lightbox.refresh();
 
-        page += 1;
-        //У відповіді бекенд повертає властивість totalHits - загальна кількість зображень, які відповідають критерію пошуку (для безкоштовного акаунту). Якщо користувач дійшов до кінця колекції, ховай кнопку і виводь повідомлення з текстом "We're sorry, but you've reached the end of search results.".
-        if (!hits.length) {
+        //page += 1;
+        //У відповіді бекенд повертає властивість totalHits -
+        //загальна кількість зображень, які відповідають критерію пошуку
+        //(для безкоштовного акаунту). Якщо користувач дійшов до кінця колекції,
+        //ховай кнопку і виводь повідомлення з текстом
+        //"We're sorry, but you've reached the end of search results.".
+        const lastPage = totalHits / PER_PAGE;
+
+        if (page >= lastPage) {
           observer.unobserve(links.scrollArea);
           Notiflix.Notify.failure(
             "We're sorry, but you've reached the end of search results."
           );
         }
+        page += 1;
       } catch (error) {
         console.error(error);
         observer.unobserve(links.scrollArea);
